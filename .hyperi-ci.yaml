@@ -1,6 +1,15 @@
-# Project:    ci-test-python-cli
-# License:    FSL-1.1-ALv2
-# Copyright:  (c) 2026 HYPERI PTY LIMITED
+# Project:   ci-test-python-app
+# File:      .hyperi-ci.yaml
+# Purpose:   HyperI CI configuration
+#
+# License:   FSL-1.1-ALv2
+# Copyright: (c) 2026 HYPERI PTY LIMITED
+#
+# Python application variant in the hyperi-ci test matrix. Sibling repo:
+#   ci-test-python-lib  — library variant (no Dockerfile, auto-skip)
+#
+# App variant — has [project.scripts] entry + Dockerfile, exercises the
+# custom-mode container build path (Dockerfile detected -> buildx -> GHCR).
 
 language: python
 
@@ -13,17 +22,13 @@ test:
 build:
   enabled: true
   type: app
+  strategies:
+    - native
 
 publish:
   enabled: true
-  # `target` drives all artefact routing. `oss` -> GHCR + public PyPI;
-  # `internal` -> JFrog. The container path is identical — registry
-  # bases are derived from target by hyperi-ci.
   target: oss
   container:
-    # Strict mode: fail loudly if the Dockerfile / template detection
-    # regresses. This is a canary for the new container pipeline so we
-    # want any signal-detection breakage to surface immediately.
     enabled: true
     dockerfile: Dockerfile
     platforms:
