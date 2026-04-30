@@ -18,7 +18,10 @@ dynamic = ["version"]
 # projects. Including it here exercises the wheel-time dep resolution
 # and the runtime import path inside the container.
 dependencies = [
-    "hyperi-pylib>=2.24",
+    # [metrics] pulls psutil — required because hyperi_pylib's __init__
+    # eagerly imports the metrics submodule, which fails at import time
+    # without psutil even if metrics aren't used at runtime.
+    "hyperi-pylib[metrics]>=2.24",
 ]
 
 [project.scripts]
