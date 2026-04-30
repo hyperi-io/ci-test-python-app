@@ -13,3 +13,19 @@ test:
 build:
   enabled: true
   type: app
+
+publish:
+  enabled: true
+  # `target` drives all artefact routing. `oss` -> GHCR + public PyPI;
+  # `internal` -> JFrog. The container path is identical — registry
+  # bases are derived from target by hyperi-ci.
+  target: oss
+  container:
+    # Strict mode: fail loudly if the Dockerfile / template detection
+    # regresses. This is a canary for the new container pipeline so we
+    # want any signal-detection breakage to surface immediately.
+    enabled: true
+    dockerfile: Dockerfile
+    platforms:
+      - linux/amd64
+      - linux/arm64
