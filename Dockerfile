@@ -1,6 +1,6 @@
-# Project:   ci-test-python-cli
+# Project:   ci-test-python-app
 # File:      Dockerfile
-# Purpose:   Container image for the ci-test-python-cli CLI
+# Purpose:   Container image for the ci-test-python-app CLI
 # License:   FSL-1.1-ALv2
 # Copyright: (c) 2026 HYPERI PTY LIMITED
 
@@ -26,7 +26,7 @@ RUN pip install --no-cache-dir build \
 # -- Runtime stage -------------------------------------------------------------
 FROM python:3.12-slim
 
-# Inherit virtualenv from builder; CLI binary is at /opt/venv/bin/ci-test-cli
+# Inherit virtualenv from builder; CLI binary is at /opt/venv/bin/ci-test-python-app
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:${PATH}"
 
@@ -37,7 +37,7 @@ WORKDIR /home/appuser
 
 # Smoke check: --version must exit 0
 HEALTHCHECK --interval=30s --timeout=3s --start-period=2s --retries=2 \
-    CMD ci-test-cli --version || exit 1
+    CMD ci-test-python-app --version || exit 1
 
-ENTRYPOINT ["ci-test-cli"]
+ENTRYPOINT ["ci-test-python-app"]
 CMD ["--version"]

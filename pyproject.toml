@@ -1,27 +1,51 @@
-# Project:    ci-test-python-cli
-# License:    FSL-1.1-ALv2
-# Copyright:  (c) 2026 HYPERI PTY LIMITED
+# Project:   ci-test-python-app
+# License:   FSL-1.1-ALv2
+# Copyright: (c) 2026 HYPERI PTY LIMITED
 
 [build-system]
 requires = ["hatchling"]
-backend-path = []
 build-backend = "hatchling.build"
 
 [project]
-name = "ci-test-python-cli"
-version = "1.0.2"
-description = "Minimal Python CLI for testing HyperI CI pipelines"
-requires-python = ">=3.9"
+name = "ci-test-python-app"
+description = "Python app variant — exercises hyperi-ci container custom mode (GHCR)"
+requires-python = ">=3.12"
 license = "FSL-1.1-ALv2"
-authors = [
-    { name = "HYPERI PTY LIMITED" },
+authors = [{ name = "HYPERI PTY LIMITED" }]
+dynamic = ["version"]
+
+# hyperi-pylib is the standard logger/config dep across DFE Python
+# projects. Including it here exercises the wheel-time dep resolution
+# and the runtime import path inside the container.
+dependencies = [
+    "hyperi-pylib>=2.24",
 ]
 
 [project.scripts]
-ci-test-cli = "ci_test_cli.main:main"
+ci-test-python-app = "ci_test_python_app.main:main"
+
+[project.urls]
+Repository = "https://github.com/hyperi-io/ci-test-python-app"
+
+[tool.hatch.version]
+path = "src/ci_test_python_app/__init__.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/ci_test_cli"]
+packages = ["src/ci_test_python_app"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "D"]
+ignore = ["D203", "D213"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D"]
