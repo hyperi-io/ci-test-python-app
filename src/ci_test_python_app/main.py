@@ -5,54 +5,65 @@
 
 Validates two parts of the hyperi-ci pipeline at once:
 
-1. The hyperi-pylib dependency resolves at install time — the import
-   on line 1 of ``main()`` would fail if pip didn't pull it through.
+1. The scalo dependency resolves at install time — the app is built on
+   scalo's ``ServiceApp`` framework, so a missing dep fails immediately.
 2. The container build path picks up the Dockerfile (custom mode),
    pushes the resulting image to GHCR, and the image's ``ENTRYPOINT``
-   actually runs (the HEALTHCHECK exercises ``--version``).
+   actually runs (the HEALTHCHECK exercises the ``version`` subcommand).
+
+Built on ``scalo.cli.ServiceApp`` (scalo 2.29+), which provides the
+standard subcommands hyperi-ci depends on — in particular
+``generate-artefacts``, invoked by the CI generate stage as
+``<app> generate-artefacts --output-dir ci-tmp``.
 """
 
 from __future__ import annotations
 
-import argparse
 import sys
+from typing import Any
 
-from hyperi_pylib import logger
+from scalo.cli import ServiceApp, VersionInfo
+from scalo.logger import logger
 
 from ci_test_python_app import __version__
 
 
-def build_parser() -> argparse.ArgumentParser:
-    """Build the argument parser."""
-    parser = argparse.ArgumentParser(
-        prog="ci-test-python-app",
-        description="Python app variant for the hyperi-ci test matrix.",
-    )
-    parser.add_argument(
-        "--version",
-        action="version",
-        version=f"%(prog)s {__version__}",
-    )
-    return parser
+class CiTestPythonApp(ServiceApp):
+    """Trivial service proving the scalo CLI lifecycle boots in CI."""
+
+    name = "ci-test-python-app"
+    env_prefix = "CI_TEST_PYTHON_APP"
+
+    def version_info(self) -> VersionInfo:
+        """Return version metadata for the ``version`` subcommand."""
+        return VersionInfo(self.name, __version__)
+
+    def run_service(self, config: Any) -> None:
+        """Log a line and print the version — that's the whole service.
+
+        The service is intentionally trivial: it only needs to prove
+        the binary boots, can resolve scalo at runtime, and emits a
+        log line. The full container build/push path is what's actually
+        being validated by CI.
+
+        Args:
+            config: Dynaconf settings object (unused).
+        """
+        logger.info("ci-test-python-app booted", version=__version__)
+        print(f"ci-test-python-app {__version__}")
 
 
 def main(argv: list[str] | None = None) -> int:
     """Run the CLI and return an exit code.
 
-    The CLI is intentionally trivial — it only needs to prove that the
-    binary boots, can resolve hyperi-pylib at runtime, and emits a
-    log line. The full container build/push path is what's actually
-    being validated by CI.
-
     Args:
         argv: Optional argument list. Defaults to ``sys.argv[1:]`` when None.
 
     Returns:
-        Exit code (0 on success).
+        Exit code (0 on success). In practice Typer's standalone mode
+        raises ``SystemExit`` itself for help/version/parse outcomes.
     """
-    build_parser().parse_args(argv)
-    logger.info("ci-test-python-app booted", version=__version__)
-    print(f"ci-test-python-app {__version__}")
+    CiTestPythonApp().cli(argv)
     return 0
 
 

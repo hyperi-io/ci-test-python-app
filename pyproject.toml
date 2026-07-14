@@ -14,14 +14,16 @@ license = "FSL-1.1-ALv2"
 authors = [{ name = "HYPERI PTY LIMITED" }]
 dynamic = ["version"]
 
-# hyperi-pylib is the standard logger/config dep across DFE Python
-# projects. Including it here exercises the wheel-time dep resolution
-# and the runtime import path inside the container.
+# scalo (successor to hyperi-pylib) is the standard logger/config dep
+# across DFE Python projects. Including it here exercises the wheel-time
+# dep resolution and the runtime import path inside the container.
+# 2.29+ ships the generate-artefacts CLI required by hyperi-ci's
+# generate stage.
 dependencies = [
-    # [metrics] pulls psutil — required because hyperi_pylib's __init__
+    # [metrics] pulls psutil — required because scalo's __init__
     # eagerly imports the metrics submodule, which fails at import time
     # without psutil even if metrics aren't used at runtime.
-    "hyperi-pylib[metrics]>=2.24",
+    "scalo[metrics]>=2.29",
 ]
 
 [project.scripts]

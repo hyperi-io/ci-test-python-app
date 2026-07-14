@@ -35,9 +35,9 @@ RUN useradd --create-home --uid 10001 --shell /bin/bash appuser
 USER appuser
 WORKDIR /home/appuser
 
-# Smoke check: --version must exit 0
+# Smoke check: the scalo ServiceApp `version` subcommand must exit 0
 HEALTHCHECK --interval=30s --timeout=3s --start-period=2s --retries=2 \
-    CMD ci-test-python-app --version || exit 1
+    CMD ci-test-python-app version || exit 1
 
 ENTRYPOINT ["ci-test-python-app"]
-CMD ["--version"]
+CMD ["version"]
