@@ -8,7 +8,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ci-test-python-app"
-description = "Python app variant — exercises hyperi-ci container custom mode (GHCR)"
+description = "hyperi-ci E2E fixture: Python app, container custom mode on GHCR"
 requires-python = ">=3.12"
 license = "FSL-1.1-ALv2"
 authors = [{ name = "HYPERI PTY LIMITED" }]
