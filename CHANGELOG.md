@@ -3,6 +3,12 @@
 Rendered by CI and committed back at the end of a release -- do not edit by
 hand. Release notes also appear on the GitHub Releases page, one per tag.
 
+## [1.0.6](https://github.com/hyperi-io/ci-test-python-app/compare/v1.0.5...v1.0.6) (2026-10-22)
+
+### Bug Fixes
+
+* **deps:** refresh the lock to current releases ([a9570c9](https://github.com/hyperi-io/ci-test-python-app/commit/a9570c9dc185353bab997424307d2c737d7d2cc1))
+
 ## [1.0.5](https://github.com/hyperi-io/ci-test-python-app/compare/v1.0.4...v1.0.5) (2026-10-21)
 
 ### Bug Fixes
