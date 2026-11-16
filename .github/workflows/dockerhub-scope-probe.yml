@@ -1,0 +1,37 @@
+name: Docker Hub token scope probe
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print only the actions Docker Hub grants the token
+        env:
+          HUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          HUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        shell: python
+        run: |
+          import base64, json, os, urllib.request
+          user, token = os.environ["HUB_USER"], os.environ["HUB_TOKEN"]
+          basic = base64.b64encode(f"{user}:{token}".encode()).decode()
+
+          def granted(scope):
+              url = f"https://auth.docker.io/token?service=registry.docker.io&scope={scope}"
+              req = urllib.request.Request(url)
+              req.add_header("Authorization", f"Basic {basic}")
+              jwt = json.load(urllib.request.urlopen(req))["token"]
+              body = jwt.split(".")[1]
+              claims = json.loads(base64.urlsafe_b64decode(body + "=" * (-len(body) % 4)))
+              return [a.get("actions") for a in claims.get("access") or []]
+
+          print("sanity, library/alpine pull:", granted("repository:library/alpine:pull"))
+          listing = json.load(urllib.request.urlopen(
+              f"https://hub.docker.com/v2/namespaces/{user}/repositories?page_size=5"))
+          repos = [r["name"] for r in listing.get("results", [])]
+          print("owned repositories found:", len(repos))
+          for name in repos[:3]:
+              print("owned repo push,pull:", granted(f"repository:{user}/{name}:pull,push"))
