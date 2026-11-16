@@ -5,7 +5,7 @@
 # Copyright: (c) 2026 HYPERI PTY LIMITED
 
 # -- Build stage ---------------------------------------------------------------
-FROM python:3.12-slim AS builder
+FROM python:3.14-slim AS builder
 
 ENV PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
@@ -24,7 +24,7 @@ RUN pip install --no-cache-dir build \
     && /opt/venv/bin/pip install --no-cache-dir dist/*.whl
 
 # -- Runtime stage -------------------------------------------------------------
-FROM python:3.12-slim
+FROM python:3.14-slim
 
 # Inherit virtualenv from builder; CLI binary is at /opt/venv/bin/ci-test-python-app
 COPY --from=builder /opt/venv /opt/venv
